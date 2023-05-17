@@ -1,0 +1,96 @@
+-- 03) 创建视图DEPT_VIEW，显示DEPT表中的部门编号和部门名称，并按部门名称排序。
+CREATE VIEW V3 AS
+SELECT DEPTNO, DNAME
+FROM DEPT
+ORDER BY DNAME;
+
+-- 06) 查询部门编号是20，工作是“clerk”（办事员）的职工信息，并按姓名排序。
+CREATE VIEW V6 AS
+SELECT ENAME
+FROM EMP
+WHERE DEPTNO = 20 AND JOB = 'CLERK'
+ORDER BY ENAME;
+
+-- 09) 创建视图EMP_TOTAL_INCOME，显示所有职工的姓名和各项收入总和(sal+comm)，并按姓名排序。
+CREATE VIEW V9 AS
+SELECT ENAME, SAL + NVL(COMM, 0) AS TOTAL_INCOME
+FROM EMP
+ORDER BY ENAME;
+
+-- 12) 创建视图DEPT_AVG_SAL, 查询出每个部门比本部门平均工资高的职工人数，并按部门编号排序。
+CREATE VIEW V12 AS
+SELECT E.DEPTNO, COUNT(*) AS NUM_OF_EMPLOYEES
+FROM EMP E
+WHERE E.SAL > (SELECT AVG(SAL) FROM EMP WHERE DEPTNO = E.DEPTNO)
+GROUP BY E.DEPTNO
+ORDER BY E.DEPTNO;
+
+-- 15) 创建视图EMP_SUPERIORS，列出所有职工的姓名及其直接上级的姓名，并按职工姓名排序。
+CREATE VIEW V15 AS
+SELECT E.ENAME, M.ENAME AS SUPERIOR
+FROM EMP E
+LEFT JOIN EMP M ON E.MGR = M.EMPNO
+ORDER BY E.ENAME;
+
+-- 18) 创建视图CLERKS_DEPT，列出所有办事员的姓名及其部门名称，并按姓名排序。
+CREATE VIEW V18 AS
+SELECT E.ENAME, D.DNAME
+FROM EMP E
+JOIN DEPT D ON E.DEPTNO = D.DEPTNO
+WHERE E.JOB = 'CLERK'
+ORDER BY E.ENAME;
+
+-- 21) 创建视图HIGH_SALARY，列出工资高于公司平均工资的所有职工，并按姓名排序。
+CREATE VIEW V21 AS
+SELECT ENAME
+FROM EMP
+WHERE SAL > (SELECT AVG(SAL) FROM EMP)
+ORDER BY ENAME;
+
+-- 24) 创建视图HIGH_SALARY_DEPT_30，列出工资高于在部门30工作的所有职工的工资的职工姓名和工资，并按姓名排序。
+CREATE VIEW V24 AS
+SELECT E.ENAME, E.SAL
+FROM EMP E
+WHERE E.SAL > (SELECT MAX(SAL) FROM EMP WHERE DEPTNO = 30)
+AND E.DEPTNO <> 30
+ORDER BY E.ENAME;
+
+-- 27) 创建视图DEPT_INFO，列出所有部门的详细信息和部门人数，并按部门编号排序。
+CREATE VIEW V27 AS
+SELECT D.DEPTNO, D.DNAME, D.CID, C.CNAME, COUNT(E.EMPNO) AS NUM_OF_EMPLOYEES
+FROM DEPT D
+LEFT JOIN COUNTRIES C ON D.CID = C.CID
+LEFT JOIN EMP E ON D.DEPTNO = E.DEPTNO
+GROUP BY D.DEPTNO, D.DNAME, D.CID, C.CNAME
+ORDER BY D.DEPTNO;
+
+-- 30) 创建视图TOP_DEPT，列出平均工资最高的部门的名称。
+CREATE VIEW V30 AS
+SELECT DNAME
+FROM DEPT
+WHERE DEPTNO = (SELECT DEPTNO FROM (
+  SELECT DEPTNO, AVG(SAL) AS AVG_SAL
+  FROM EMP
+  GROUP BY DEPTNO
+  ORDER BY AVG_SAL DESC
+) WHERE ROWNUM = 1);
+
+-- 33) 查询总裁(president)工作部门所在的国家。
+CREATE VIEW V33 AS
+SELECT CNAME
+FROM COUNTRIES C
+JOIN DEPT D ON C.CID = D.CID
+JOIN EMP E ON D.DEPTNO = E.DEPTNO
+WHERE E.JOB = 'PRESIDENT';
+-- 写出下列应用对应的SQL语句，并将查询语句定义为视图。
+-- 03) 显示DEPT表中的部门编号和部门名称，并按部门名称排序。
+-- 06) 列出部门编号是20，工作是“clerk”（办事员）的职工信息，并按姓名排序。
+-- 09) 显示所有职工的姓名和各项收入总和(sal+comm)，并按姓名排序。
+-- 12) 查询出每个部门比本部门平均工资高的职工人数，并按部门编号排序。
+-- 15) 列出所有职工的姓名及其直接上级的姓名，并按职工姓名排序。
+-- 18) 列出所有办事员的姓名及其部门名称，并按姓名排序。
+-- 21) 列出工资高于公司平均工资的所有职工，并按姓名排序。
+-- 24) 列出工资高于在部门30工作的所有职工的工资的职工姓名和工资，并按姓名排序。
+-- 27) 列出所有部门的详细信息和部门人数，并按部门编号排序。
+-- 30) 列出平均工资最高的部门的名称。
+-- 33) 列出总裁(president)工作部门所在的国家。

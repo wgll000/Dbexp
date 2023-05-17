@@ -1,0 +1,18 @@
+UPDATE
+	DEPT d
+SET
+	d.EMPS = (
+	SELECT
+		COUNT(*)
+	FROM
+		EMP e
+	WHERE
+		e.DEPTNO = d.DEPTNO
+		),
+	d.INCOME = (
+	SELECT
+		COALESCE(SUM(e.SAL + e.COMM), 0)
+	FROM
+		EMP e
+	WHERE
+		e.DEPTNO = d.DEPTNO);
